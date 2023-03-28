@@ -94,6 +94,13 @@ FROM movies JOIN actors ON actors.id IN(
             SELECT id FROM producers
             WHERE name='John Smith');
 
+
+SELECT movies.title,actors.name
+FROM movies JOIN movie_actor ON movies.id=movie_actor.movie_id
+			JOIN actors ON movie_actor.actor_id=actors.id
+            JOIN producers ON movies.producer_id=producers.id
+            WHERE producers.name='John Smith';
+            
 #1.5
 SELECT actors.name, AVG(movies.lenght) as avgLenght
 FROM movies JOIN actors ON actors.id 
@@ -104,3 +111,5 @@ FROM movies JOIN actors ON actors.id
                         FROM movies
                         WHERE movies.year<2000)
                         GROUP BY actors.name;
+
+                        
