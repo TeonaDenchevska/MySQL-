@@ -92,15 +92,6 @@ FROM alpinist JOIN Participate ON alpinist.id=Participate.Leader_of_Expedition
 			   JOIN mountain ON peak.mountain_id=mountain.id
                WHERE alpinist.Last_Name='Ivanov' AND mountain.name='Mon Blan';
          
-SELECT actors.name, AVG(movies.lenght) as avgLenght
-FROM movies JOIN actors ON actors.id 
-						IN(SELECT actor_id FROM movie_actor
-                        WHERE movie_actor.movie_id=movies.id)
-                        WHERE movies.lenght> (SELECT 
-                        AVG(movies.lenght)
-                        FROM movies
-                        HAVING movies.year<2000)
-                        GROUP BY actors.name;
 #4 не е готово
 SELECT mountain.name,contry.continent,AVG(COUNT(expedition))
 FROM country JOIN mountain ON mountain.id IN(SELECT mountain_id FROM located 
