@@ -406,4 +406,45 @@ DELIMITER ;
 
 call CountGroups("Ivan Todorov Petkov");
 call CountGroups("Petar Slavkov Yordanov");
+ 
+ 
+use transaction_test;
+DROP PROCEDURE IF EXISTS Transfer_Money;
+DELIMITER //
 
+CREATE PROCEDURE Transfer_Money(
+    IN from_account_id INT,
+    IN to_account_id INT,
+    IN transfer_amount DOUBLE
+)
+BEGIN
+    DECLARE from_account_balance DOUBLE;
+    DECLARE error_message VARCHAR(255) DEFAULT '';
+
+    SELECT amount INTO from_account_balance FROM customer_accounts WHERE id = from_account_id;
+    IF from_account_balance >= transfer_amount THEN
+        START TRANSACTION;
+        UPDATE customer_accounts SET amount = amount - transfer_amount WHERE id = from_account_id;
+        IF ROW_COUNT() = 1 THEN
+            UPDATE customer_accounts SET amount = amount + transfer_amount WHERE id = to_account_id;
+
+            IF ROW_COUNT() = 1 THEN
+                COMMIT;
+                SET error_message='succesfull';
+            ELSE
+                SET error_message = 'Failed to update the recipient account.';
+                ROLLBACK;
+            END IF;
+        ELSE
+            SET error_message = 'Failed to update the sender account.';
+            ROLLBACK;
+        END IF;
+    ELSE
+        SET error_message = 'Insufficient balance in the sender account.';
+    END IF;
+    SELECT error_message AS 'Message';
+END //
+
+DELIMITER ;
+ 
+call Transfer_Money(1,2,50.0);
