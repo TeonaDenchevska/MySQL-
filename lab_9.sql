@@ -452,6 +452,31 @@ INSERT INTO student_sport
 VALUES 	(1, 2); 
  
  #4
- create view
+ drop view if exists StudentView;
+ create view StudentView
+ as
+ SELECT students.name, COUNT(student_sport.student_id) as NumberOfGroups
+ from student_sport JOIN students ON student_sport.student_id=students.id
+ WHERE students.id=student_sport.student_id
+ GROUP BY students.name;
+ 
+ 
+ #5
+ DROP PROCEDURE IF EXISTS CoachSport
+ DELIMITER $
+ CREATE PROCEDURE CoachSport(IN SportName VARCHAR(255))
+ BEGIN 
+ SET @sport_name=SportName;
+ SELECT coaches.name,sportgroups.id,sportgroups.location,sportgroups.hourOfTraining,sportgroups.dayOfWeek
+ FROM coaches JOIN sportgroups ON coaches.id=sportgroups.coach_id
+			  JOIN sports ON sportgroups.sport_id=sports.id
+              WHERE sports.name=@sport_name;
+ 
+ END
+ $
+ DELIMITER ;
+ 
+call CoachSport('Football');
+call CoachSport('Volleyball');
  
  
