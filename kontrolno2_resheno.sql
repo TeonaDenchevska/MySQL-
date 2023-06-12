@@ -117,8 +117,8 @@ BEGIN
     SELECT COUNT(*) INTO sales_count
     FROM deals d
     JOIN ads a ON d.ad_id = a.id
-    JOIN properties p ON a.property_id = p.id
-    WHERE p.customer_id = NEW.property_id 
+	JOIN properties p ON a.property_id = p.id
+    WHERE p.customer_id = NEW.customer_id
     AND a.action_id = (SELECT id FROM actions WHERE actionType = 'sales');
     
 
@@ -146,13 +146,15 @@ FOR EACH ROW
 BEGIN
     DECLARE owner_listing_count INT;
     
+
     SELECT COUNT(*) INTO owner_listing_count
     FROM ads a
     JOIN properties p ON a.property_id = p.id
-    WHERE p.customer_id = NEW.property_id 
+    WHERE p.customer_id = NEW.customer_id
     AND a.action_id = (SELECT id FROM actions WHERE actionType = 'rent')
     AND a.isActual = 'Yes';
     
+
     IF owner_listing_count >= 2 THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Listing aborted. Property owner has exceeded the limit of two active rental listings.';
@@ -160,7 +162,6 @@ BEGIN
 END //
 
 DELIMITER ;
-
 INSERT INTO ads (isActual, publicationDate, action_id, property_id)
 VALUES ('Yes', '2023-06-01', 1,1),
        ('No', '2023-06-02', 2,2),
